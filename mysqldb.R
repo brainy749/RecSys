@@ -120,5 +120,7 @@ con <- dbConnect(MySQL(),
 #name will create a table and value will update the values.
 dbWriteTable(con, name='predictions', value=Predictions_update)
 
-# Computations Done.
+# Computations Done and file uploaded to MySQL Database.
+
+# You can do the samething for User-User Similarity matrix also.
 

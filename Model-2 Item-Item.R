@@ -1,20 +1,13 @@
-# Set the Working data
-
-#Load the Libraries 
-library(dplyr)
-library(plyr)
-
 # Assumptions 
 # 1. We are Using Pearson-Correlation to find the Item-Item Similarity.
 # 2. We are Using the Similarity to find the results. We have scaled the data with mean before finding the
 #   correlation
 
 #Laod the data
-ratingsdummydata <- read.csv("ratingsdummydata.csv",sep = ",",header = TRUE)
+ratingsdummydata <- read.csv("data/ratingsdummydata.csv")
 rownames(ratingsdummydata) <- ratingsdummydata[,1]
 ratingsdummydata <- ratingsdummydata[,-1]
 str(ratingsdummydata)
-
 
 #Create a dummy martix 
 Users <- as.list(colnames(ratingsdummydata))
@@ -97,33 +90,30 @@ for ( i in 1:nrow(Predictions)){
 
 # For time Being we will give the number of the Customer Instead of his name.
 Username <- function(x){
-  UserPredictions <- Predictions[x,1:ncol(Predictions)]
-  meanuserrating <- mean(as.matrix(ratingsdummydata[x,1:ncol(ratingsdummydata)]),na.rm = TRUE)
-  GreaterthanMeanNum <- which(Predictions[x,1:ncol(Predictions)] <= meanuserrating)
-  if(length(GreaterthanMeanNum) == 0){
-    UserPredictions <- UserPredictions[colSums(!is.na(UserPredictions)) > 0]
-    UserPredictions <- sort(UserPredictions,decreasing = TRUE)
-  }else{
-    UserPredictions <- UserPredictions[-(GreaterthanMeanNum)]
-    UserPredictions <- sort(UserPredictions[-which(is.na(UserPredictions))],decreasing = TRUE)
-  }
-  if(length(UserPredictions) == 0){
-    return("No Predictions")
+  numofmovies <- length(which(rownames(Predictions) == x))
+  whichmovie <- which(rownames(Predictions) == x)
+  if(numofmovies == 0){
+    return (NULL)
   }
   else{
-    return (colnames(UserPredictions))
+    UserPredictions <- Predictions[whichmovie,1:ncol(Predictions)]
+    meanuserrating <- mean(as.matrix(ratingsdummydata[whichmovie,1:ncol(ratingsdummydata)]),na.rm = TRUE)
+    GreaterthanMeanNum <- which(Predictions[whichmovie,1:ncol(Predictions)] <= meanuserrating)
+    if(length(GreaterthanMeanNum) == 0){
+      UserPredictions <- UserPredictions[colSums(!is.na(UserPredictions)) > 0]
+      UserPredictions <- sort(UserPredictions,decreasing = TRUE)
+    }else{
+      UserPredictions <- UserPredictions[-(GreaterthanMeanNum)]
+      UserPredictions <- sort(UserPredictions[-which(is.na(UserPredictions))],decreasing = TRUE)
+    }
+    if(length(UserPredictions) == 0){
+      return("No Predictions")
+    }
+    else{
+      return (colnames(UserPredictions))
+    }
   }
 }
 
-# Only with number it is working 
-Username(1)
-Username(2)
-Username(3)
-Username(4)
-Username(5)
-Username(6)
-Username(7)
-Username(8)
-Username(9)
-Username(10)
-
+# You can give the username for predictions instead of number like the previous one.
+# The username function will give a Null vector if the input name is not der in the database.
